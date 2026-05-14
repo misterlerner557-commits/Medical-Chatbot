@@ -281,8 +281,8 @@ def detect_tts_lang(text: str) -> str:
 def detect_intent(text: str):
     t = text.lower().strip()
 
-    greetings = ["hi", "hello", "hey", "hii"]
-    if t in greetings or t.startswith(tuple(greetings)):
+    greetings = ["hi", "hello", "hey", "hii","Namaskara"]
+    if t in greetings:
         return ("greeting", None)
 
     # translation
@@ -320,13 +320,33 @@ def detect_intent(text: str):
 
     # medical questions
     medical_words = [
-        "symptom", "symptoms", "pain", "fever", "cough", "infection",
-        "disease", "treatment", "cause", "diagnosis", "medicine",
-        "tablet", "drug", "rash", "diarrhea", "asthma",
-        "diabetes", "heart", "skin", "typhoid","mental", "lifestyle", "health", "wellness",
-        "interaction", "interactions", "side effect",
-        "exercise", "diet", "stress"
-        ]
+    "symptom", "symptoms",
+    "pain", "body pain", "chest pain", "stomach pain",
+    "fever", "cold", "cough", "infection",
+    "disease", "treatment", "cause", "diagnosis",
+    "medicine", "tablet", "drug", "rash",
+    "diarrhea", "vomiting", "nausea",
+    "asthma", "diabetes", "heart",
+    "skin", "typhoid", "bp",
+    "blood pressure", "hypertension",
+    "sugar", "headache", "migraine",
+    "mental", "stress", "anxiety",
+    "weakness", "fatigue",
+    "exercise", "diet", "health", "wellness"
+    ]
+    
+    symptom_patterns = [
+    "i have",
+    "i am having",
+    "suffering from",
+    "feeling",
+    "my",
+    "having"
+    ]
+    
+    if any(p in t for p in symptom_patterns):
+        return ("medical", None)
+    
     if any(w in t for w in medical_words) or t.startswith(("what is", "explain")):
         return ("medical", None)
 
@@ -447,18 +467,16 @@ def call_rag_with_retry(text, retries=3, delay=1.0, sender_id="whatsapp"):
                 f"The user previously asked about '{topic}'. "
                 f"Now they are asking: {text}. "
                 f"Explain treatment, recovery, and prevention."
-            )
+                )
             last_user_query[sender_id] = followup_query
             text = followup_query
             intent = "followup"
         else:
-            return "I'm here to help with medical questions. Please describe your symptoms or condition."
-
-    # --------------------------  
-    # 5️⃣ NON-MEDICAL  
-    # --------------------------
-    if intent == "other":
-        return "I'm here to help with medical questions. Please describe your symptoms or condition."
+            return (
+                "I'm here to help with medical questions.\n"
+                "Please describe your medical condition or symptoms.\n"
+                "For example: fever, BP, headache, cough, diabetes."
+            )
 
     # --------------------------
     # 6️⃣ NORMAL RAG PROCESS  
