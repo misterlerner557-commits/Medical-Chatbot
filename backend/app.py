@@ -31,7 +31,7 @@ from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
 import pytesseract
-pytesseract.pytesseract.tesseract_cmd = "/usr/bin/tesseract"
+pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 from PIL import Image
 import cv2
 from pypdf import PdfReader
@@ -281,7 +281,7 @@ def detect_tts_lang(text: str) -> str:
 def detect_intent(text: str):
     t = text.lower().strip()
 
-    greetings = ["hi", "hello", "hey", "hii","Namaskara"]
+    greetings = ["hi", "hello", "hey", "hii"]
     if t in greetings:
         return ("greeting", None)
 
